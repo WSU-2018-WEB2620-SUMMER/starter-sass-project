@@ -1,6 +1,6 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
   entry: './src/javascripts/app.js',
   output: {
@@ -10,9 +10,22 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: { presets: ['es2015'] }
+        test: /^((?!index).)*\.html$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: { name: '[name].[ext]' }
+          }
+        ],
+      },
+      {
+        test: /\.(png|svg|jpg|gif|ico)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: { name: 'images/[name].[ext]' }
+          }
+        ],
       }, {
         test: /\.css$/,
         use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
@@ -25,10 +38,13 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: 'stylesheets/application.css',
-    }), 
-    new CopyWebpackPlugin([
-      { from: 'src/*.html', flatten: true},
-      { context: 'src/images', from: '**/*', to: 'images' } 
-    ])
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      hash: true,
+      template: './src/index.html',
+      filename: 'index.html'
+    })
   ]
 };
+
